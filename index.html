@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - PriceWatch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* --- Barra Lateral de Navegação --- */
+        .sidebar {
+            width: 260px;
+            background-color: #2d3748;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar .logo {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .sidebar nav { flex-grow: 1; }
+        .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar nav li a { display: flex; align-items: center; color: #cbd5e0; text-decoration: none; padding: 15px; border-radius: 6px; margin-bottom: 10px; transition: background-color 0.3s ease, color 0.3s ease; }
+        .sidebar nav li a .icon { margin-right: 15px; width: 20px; text-align: center; }
+        .sidebar nav li a:hover { background-color: #4a5568; color: #ffffff; }
+        .sidebar nav li a.active { background-color: #3182ce; color: #ffffff; font-weight: 500; }
+        
+        /* --- Conteúdo Principal --- */
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .page-header { border-bottom: 1px solid #4a5568; padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .page-header h1 { color: #ffffff; font-size: 2rem; margin: 0; }
+
+        /* --- Estilos Genéricos --- */
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 1024px) { .grid-container { grid-template-columns: 1fr 1fr; } }
+        
+        .card { background-color: #2d3748; padding: 30px; border-radius: 8px; }
+        .card h3 { margin-top: 0; border-bottom: 1px solid #4a5568; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #a0aec0; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; max-width: 400px; padding: 12px; border: 1px solid #4a5568; border-radius: 4px; background-color: #1a202c; color: #e2e8f0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #4a5568; }
+        th { background-color: #4a5568; color: #ffffff; }
+        td .role-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        td .role-admin { background-color: #c53030; color: #fff; }
+        td .role-analyst { background-color: #2b6cb0; color: #fff; }
+        td .role-user { background-color: #2f855a; color: #fff; }
+        td a { color: #63b3ed; text-decoration: none; margin-right: 15px; }
+        td a:hover { text-decoration: underline; }
+
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; color: white; font-size: 1rem; cursor: pointer; transition: background-color 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background-color: #3182ce; }
+        .btn-primary:hover { background-color: #2b6cb0; }
+        .btn-success { background-color: #38a169; }
+        .btn-success:hover { background-color: #2f855a; }
+        .btn-secondary { background-color: #4a5568; }
+        .btn-secondary:hover { background-color: #718096; }
+        .btn-danger { background-color: #c53030; }
+        .btn-danger:hover { background-color: #9b2c2c; }
+
+        /* --- Estilos Específicos --- */
+        .notification-toggle { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #4a5568; padding-top: 20px; margin-top: 20px;}
+        .notification-toggle .description { font-size: 0.9rem; color: #a0aec0; margin: 0; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4a5568; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+        input:checked + .slider { background-color: #3182ce; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
+
+        .integration-item { display: flex; align-items: center; gap: 20px; padding: 15px 0; border-bottom: 1px solid #4a5568; }
+        .integration-item:last-child { border-bottom: none; }
+        .integration-item .icon { font-size: 2rem; color: #cbd5e0; width: 40px; text-align: center; }
+        .integration-item .info { flex-grow: 1; }
+        .integration-item .info h4 { margin: 0 0 5px 0; color: #ffffff; }
+        .integration-item .info p { margin: 0; font-size: 0.9rem; color: #a0aec0; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .status-badge.connected { background-color: #38a169; color: #fff; }
+
+        .checkbox-group label { font-weight: bold; color: #e2e8f0; margin-bottom: 15px; display: block; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+        .checkbox-item { display: flex; align-items: center; background-color: #4a5568; padding: 10px; border-radius: 4px; }
+        .checkbox-item input[type="checkbox"] { width: 1.2em; height: 1.2em; margin-right: 10px; accent-color: #3182ce; }
+        .checkbox-item label { color: #cbd5e0; font-weight: normal; margin-bottom: 0; }
+
+        .execution-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 40px; border-top: 1px solid #4a5568; margin-top: 30px; padding-top: 30px; }
+        .action-box h4 { margin-top: 0; }
+        .log-output { background-color: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; padding: 20px; border-radius: 8px; height: 300px; overflow-y: scroll; white-space: pre-wrap; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } .dashboard-grid .card-full-width { grid-column: 1 / -1; } }
+        .dashboard-card { position: relative; background-color: #2d3748; padding: 20px; border-radius: 8px; }
+        .dashboard-card h3 { margin-top: 0; }
+        .dashboard-card p { color: #a0aec0; font-size: 0.9rem; }
+        .edit-chart-btn { position: absolute; top: 15px; right: 15px; color: #a0aec0; font-size: 1rem; text-decoration: none; transition: color 0.3s ease; }
+        .edit-chart-btn:hover { color: #ffffff; }
+        .chart-container { position: relative; width: 100%; padding-top: 50%; }
+        .chart-container svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .chart-grid-line { stroke: #4a5568; stroke-dasharray: 2,2; }
+        .chart-axis-line { stroke: #a0aec0; }
+        .chart-label { fill: #a0aec0; font-size: 12px; }
+        .chart-legend { font-size: 12px; fill: #ffffff; }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">PriceWatch</div>
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-link active" data-page="execucao"><i class="fas fa-play icon"></i> Execução</a></li>
+                <li><a href="#" class="nav-link" data-page="adicionar"><i class="fas fa-plus-circle icon"></i> Empresas</a></li>
+                <li><a href="#" class="nav-link" data-page="basedados"><i class="fas fa-database icon"></i> Base de Dados</a></li>
+                <li><a href="#" class="nav-link" data-page="relatorio"><i class="fas fa-chart-line icon"></i> Dashboards</a></li>
+                <li><a href="#" class="nav-link" data-page="configuracoes"><i class="fas fa-cog icon"></i> Configurações</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div id="execucao" class="page active">
+            <div class="page-header"><h1>Execução da Coleta</h1></div>
+            <div class="card">
+                <h3>Painel de Controle da Coleta</h3>
+                <p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:30px;">Selecione as empresas, e então inicie a coleta manual ou agende uma execução automática.</p>
+                <div class="checkbox-group">
+                    <label>1. Selecione as Empresas:</label>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item"><input type="checkbox" id="comp-pagbank-exec" checked><label for="comp-pagbank-exec">PagBank</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="comp-mercadopago-exec" checked><label for="comp-mercadopago-exec">Mercado Pago</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="comp-pagarme-exec" checked><label for="comp-pagarme-exec">Pagar.me</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="comp-cielo-exec" checked><label for="comp-cielo-exec">Cielo</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="comp-getnet-exec" checked><label for="comp-getnet-exec">Getnet</label></div>
+                    </div>
+                </div>
+                <div class="execution-actions">
+                    <div class="action-box">
+                        <h4>2. Executar Agora</h4>
+                        <p style="color:#a0aec0; font-size: 0.9rem;">Iniciar uma coleta para as<br>empresas selecionadas imediatamente.</p>
+                        <button class="btn btn-primary" style="margin-top:10px;"><i class="fas fa-play"></i> Iniciar Coleta Manual</button>
+                    </div>
+                    <div class="action-box">
+                        <h4>3. Agendar Execução</h4>
+                         <p style="color:#a0aec0; font-size: 0.9rem;">Programar uma coleta recorrente<br>para as empresas selecionadas.</p>
+                         <div class="form-group"><label for="frequency">Frequência</label><select id="frequency"><option value="daily">Diariamente</option><option value="weekly">Semanalmente</option></select></div>
+                         <div class="form-group" id="dayOfWeekGroup" style="display: none;"><label for="dayOfWeek">Dia da Semana</label><select id="dayOfWeek"><option value="mon">Segunda</option><option value="tue">Terça</option></select></div>
+                         <div class="form-group"><label for="time">Horário</label><input type="time" id="time" value="09:00"></div>
+                         <button class="btn btn-success" style="margin-top:10px;"><i class="fas fa-save"></i> Salvar Agendamento</button>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="card"><h3>Log de Execução</h3><div class="log-output">[2025-10-28 10:15:12] Sistema iniciado. Aguardando comando...</div></div>
+        </div>
+
+        <div id="adicionar" class="page">
+            <div class="page-header"><h1>Gerenciamento de Empresas</h1></div>
+            <p>Adicione novas empresas para monitorar ou edite as informações das existentes.</p>
+            <br>
+            <div class="card">
+                <h3>Adicionar Nova Empresa</h3>
+                <div class="form-group"><label for="company-name">Nome da Empresa</label><input type="text" id="company-name" placeholder="Ex: Concorrente X"></div>
+                <div class="form-group"><label for="company-segment">Segmento</label><select id="company-segment"><option value="">Selecione um segmento</option><option value="ecommerce">E-commerce</option><option value="varejo">Varejo Físico</option><option value="saas">SaaS</option></select></div>
+                <div class="form-group"><label for="company-url">URL do Site para Coleta</label><input type="url" id="company-url" placeholder="https://www.concorrentex.com/taxas"></div>
+                <div class="form-group"><label for="company-description">Descrição</label><textarea id="company-description" placeholder="Adicione detalhes sobre a empresa..."></textarea></div>
+                <button class="btn btn-success"><i class="fas fa-plus"></i> Adicionar Empresa</button>
+            </div>
+        </div>
+
+        <div id="basedados" class="page">
+             <div class="page-header"><h1>Acesso à Base de Dados</h1><button class="btn btn-success"><i class="fas fa-file-export"></i> Exportar Base de Dados</button></div>
+             <p>Visualização dos dados de taxas de adquirência coletados.</p><br>
+             <div class="table-container card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Adquirente</th><th>Produto</th><th>Parcelas</th><th>Taxa (Valor)</th><th>Data da Coleta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1024</td><td>PagBank</td><td>Cartão de crédito</td><td>1x</td><td>4.99%</td><td>2025-10-27 21:15:10</td></tr>
+                        <tr><td>1025</td><td>Mercado Pago</td><td>Cartão de crédito</td><td>1x</td><td>4.98%</td><td>2025-10-27 21:15:12</td></tr>
+                        <tr><td>1026</td><td>Pagar.me</td><td>Cartão de crédito</td><td>12x</td><td>12.99%</td><td>2025-10-27 21:15:14</td></tr>
+                        <tr><td>1027</td><td>PagBank</td><td>Pix</td><td>1x</td><td>0.99%</td><td>2025-10-27 21:15:18</td></tr>
+                        <tr><td>1028</td><td>Mercado Pago</td><td>Cartão de crédito</td><td>6x</td><td>9.90%</td><td>2025-10-27 21:15:21</td></tr>
+                        <tr><td>1029</td><td>Pagar.me</td><td>Pix</td><td>1x</td><td>0.95%</td><td>2025-10-27 21:15:25</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="relatorio" class="page">
+             <div class="page-header"><h1>Relatório de Análise de Taxas</h1><button class="btn btn-primary"><i class="fas fa-plus"></i> Criar Gráfico</button></div>
+             <p>Dashboard interativo para visualizar comparações, filtrar por data, concorrente e produto para obter insights.</p><br>
+             <div class="dashboard-grid">
+                <div class="dashboard-card card-full-width">
+                    <a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a>
+                    <h3>Comparativo de Taxas por Parcela</h3>
+                    <p>Análise da estrutura de taxas de cada concorrente para vendas parceladas no cartão de crédito.</p>
+                    <div class="chart-container">
+                        <svg viewBox="0 0 500 250">
+                            <line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line>
+                            <text x="20" y="25" class="chart-label">20%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line>
+                            <text x="20" y="125" class="chart-label">10%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line>
+                            <text x="25" y="225" class="chart-label">0%</text><text x="60" y="235" class="chart-label">1x</text><text x="250" y="235" class="chart-label">6x</text><text x="450" y="235" class="chart-label">12x</text>
+                            <polyline points="65,200 105,180 185,150 265,120 345,90 465,50" fill="none" stroke="#3182ce" stroke-width="2"/>
+                            <polyline points="65,202 105,185 185,160 265,135 345,110 465,75" fill="none" stroke="#38a169" stroke-width="2"/>
+                            <polyline points="65,198 105,175 185,145 265,110 345,80 465,40" fill="none" stroke="#e53e3e" stroke-width="2"/>
+                            <rect x="380" y="25" width="10" height="10" fill="#3182ce"></rect><text x="395" y="34" class="chart-legend">PagBank</text>
+                            <rect x="380" y="45" width="10" height="10" fill="#38a169"></rect><text x="395" y="54" class="chart-legend">Mercado Pago</text>
+                            <rect x="380" y="65" width="10" height="10" fill="#e53e3e"></rect><text x="395" y="74" class="chart-legend">Pagar.me</text>
+                        </svg>
+                    </div>
+                </div>
+                 <div class="dashboard-card">
+                    <a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a>
+                    <h3>Análise Histórica de Taxa - 6x</h3>
+                     <p>Evolução da taxa de adquirência para vendas em 6 parcelas.</p>
+                     <div class="chart-container">
+                        <svg viewBox="0 0 500 250">
+                             <line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line>
+                            <text x="10" y="25" class="chart-label">10.5%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line>
+                            <text x="15" y="125" class="chart-label">10%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line>
+                            <text x="15" y="225" class="chart-label">9.5%</text><text x="60" y="235" class="chart-label">Sem-1</text><text x="250" y="235" class="chart-label">Sem-2</text><text x="440" y="235" class="chart-label">Sem-3</text>
+                             <polyline points="70,120 260,110 450,80" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="70,140 260,135 450,138" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="70,110 260,115 450,100" fill="none" stroke="#e53e3e" stroke-width="2"/>
+                        </svg>
+                     </div>
+                </div>
+                <div class="dashboard-card">
+                    <a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a>
+                    <h3>Análise Histórica de Taxa - 12x</h3>
+                    <p>Evolução da taxa de adquirência para vendas em 12 parcelas.</p>
+                    <div class="chart-container">
+                        <svg viewBox="0 0 500 250">
+                            <line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line>
+                            <text x="15" y="25" class="chart-label">14%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line>
+                            <text x="15" y="125" class="chart-label">13%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line>
+                            <text x="15" y="225" class="chart-label">12%</text><text x="60" y="235" class="chart-label">Sem-1</text><text x="250" y="235" class="chart-label">Sem-2</text><text x="440" y="235" class="chart-label">Sem-3</text>
+                             <polyline points="70,100 260,80 450,50" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="70,120 260,110 450,115" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="70,90 260,95 450,85" fill="none" stroke="#e53e3e" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="configuracoes" class="page">
+            <div class="page-header"><h1>Configurações</h1></div>
+            <div class="grid-container">
+                <div class="card">
+                    <h3>Meu Perfil</h3>
+                    <div class="form-group"><label for="profile-name">Nome</label><input type="text" id="profile-name" value="Luiz Henrique Alvarenga"></div>
+                    <div class="form-group"><label for="profile-email">Email</label><input type="email" id="profile-email" value="luiz.alvarenga@email.com" readonly></div>
+                    <div class="notification-toggle">
+                        <div><label>Notificações por Email</label><p class="description">Alerta após a atualização de taxas.</p></div>
+                        <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
+                    </div>
+                    <div style="border-top: 1px solid #4a5568; margin-top: 20px; padding-top: 20px;"><button class="btn btn-primary">Salvar Perfil</button></div>
+                </div>
+                <div class="card">
+                     <h3>Segurança e Acesso</h3>
+                     <div class="form-group"><label>Senha</label><button class="btn btn-secondary">Alterar Senha</button></div>
+                     <div class="form-group" style="margin-top: 30px; border-top: 1px solid #4a5568; padding-top: 20px;">
+                        <label>Sair do Sistema</label><button class="btn btn-danger" onclick="alert('Simulando logout...')"><i class="fas fa-sign-out-alt"></i> Sair (Logout)</button>
+                    </div>
+                </div>
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3>Integrações do Sistema</h3>
+                    <p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Conecte o PriceWatch a outras plataformas para publicar a base de dados.</p>
+                    <div class="integration-item"><i class="fas fa-file-excel icon" style="color: #38a169;"></i><div class="info"><h4>Google Sheets</h4><p>Sincroniza a base de dados com uma planilha na nuvem.</p></div><span class="status-badge connected">Conectado</span><button class="btn btn-secondary">Gerenciar</button></div>
+                    <div class="integration-item"><i class="fas fa-database icon" style="color: #63b3ed;"></i><div class="info"><h4>Google BigQuery</h4><p>Envia os dados coletados diretamente para o seu data warehouse.</p></div><span class="status-badge connected">Conectado</span><button class="btn btn-secondary">Gerenciar</button></div>
+                </div>
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3>Gerenciamento de Usuários</h3>
+                    <p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Adicione, remova ou edite o acesso dos usuários ao sistema.</p>
+                    <div style="margin-bottom: 20px; text-align: right;"><button class="btn btn-success"><i class="fas fa-plus"></i> Adicionar Usuário</button></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Nome</th><th>Email</th><th>Perfil de Acesso</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                <tr><td>Luiz Henrique Alvarenga</td><td>luiz.alvarenga@email.com</td><td><span class="role-badge role-admin">Administrador</span></td><td><a href="#">Editar</a> <a href="#">Remover</a></td></tr>
+                                <tr><td>Vinicius Mistura Bissoli</td><td>vinicius.bissoli@email.com</td><td><span class="role-badge role-analyst">Analista</span></td><td><a href="#">Editar</a> <a href="#">Remover</a></td></tr>
+                                <tr><td>Usuário Final Exemplo</td><td>usuario.final@empresa.com</td><td><span class="role-badge role-user">Usuário</span></td><td><a href="#">Editar</a> <a href="#">Remover</a></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            const initialActiveLink = document.querySelector('.nav-link.active');
+            if (initialActiveLink) {
+                const pageId = initialActiveLink.getAttribute('data-page');
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+            }
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    pages.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    const pageId = this.getAttribute('data-page');
+                    document.getElementById(pageId).classList.add('active');
+                });
+            });
+            const frequencySelect = document.getElementById('frequency');
+            if (frequencySelect) {
+                const dayOfWeekGroup = document.getElementById('dayOfWeekGroup');
+                frequencySelect.addEventListener('change', function() {
+                    if (this.value === 'weekly') { dayOfWeekGroup.style.display = 'block'; } else { dayOfWeekGroup.style.display = 'none'; }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
