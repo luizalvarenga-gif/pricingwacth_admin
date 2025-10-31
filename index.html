@@ -114,30 +114,43 @@
         .action-box h4 { margin-top: 0; }
         .log-output { background-color: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; padding: 20px; border-radius: 8px; height: 300px; overflow-y: scroll; white-space: pre-wrap; }
 
+        .insights-panel { margin-bottom: 40px; }
+        .insights-panel h2 { color: #ffffff; border-bottom: 1px solid #4a5568; padding-bottom: 10px; }
+        .last-collection-info { color: #a0aec0; margin: -10px 0 20px 0; }
+        .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .insight-card { background-color: #2d3748; padding: 20px; border-radius: 8px; border-left: 4px solid #4a5568; }
+        .insight-card h4 { margin: 0 0 10px 0; display: flex; align-items: center; gap: 10px; }
+        .insight-card p { margin: 0; color: #cbd5e0; }
+        .insight-card .movement-list { list-style: none; padding: 0; margin: 0; }
+        .insight-card .movement-list li { margin-bottom: 10px; }
+        .text-green { color: #68d391; }
+        .text-red { color: #fc8181; }
+        .insight-card.promo { border-left-color: #f6e05e; }
+        .insight-card.competitive { border-left-color: #68d391; }
+        .insight-card.risk { border-left-color: #fc8181; }
+
         .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } .dashboard-grid .card-full-width { grid-column: 1 / -1; } }
         .dashboard-card { position: relative; background-color: #2d3748; padding: 20px; border-radius: 8px; }
         .dashboard-card h3 { margin-top: 0; }
         .dashboard-card p { color: #a0aec0; font-size: 0.9rem; }
-        .edit-chart-btn { position: absolute; top: 15px; right: 15px; color: #a0aec0; font-size: 1rem; text-decoration: none; transition: color 0.3s ease; }
-        .edit-chart-btn:hover { color: #ffffff; }
+        .edit-chart-btn { position: absolute; top: 15px; right: 15px; color: #a0aec0; font-size: 1rem; text-decoration: none; }
         .chart-container { position: relative; width: 100%; padding-top: 50%; }
         .chart-container svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .chart-grid-line { stroke: #4a5568; stroke-dasharray: 2,2; }
         .chart-axis-line { stroke: #a0aec0; }
         .chart-label { fill: #a0aec0; font-size: 12px; }
         .chart-legend { font-size: 12px; fill: #ffffff; }
-
     </style>
 </head>
 <body>
-
     <aside class="sidebar">
         <div class="logo">PriceWatch</div>
         <nav>
             <ul>
                 <li><a href="#" class="nav-link active" data-page="execucao"><i class="fas fa-play icon"></i> Execução</a></li>
                 <li><a href="#" class="nav-link" data-page="adicionar"><i class="fas fa-plus-circle icon"></i> Empresas</a></li>
+                <li><a href="#" class="nav-link" data-page="minhas-taxas"><i class="fas fa-tags icon"></i> Minhas Taxas</a></li>
                 <li><a href="#" class="nav-link" data-page="basedados"><i class="fas fa-database icon"></i> Base de Dados</a></li>
                 <li><a href="#" class="nav-link" data-page="relatorio"><i class="fas fa-chart-line icon"></i> Dashboards</a></li>
                 <li><a href="#" class="nav-link" data-page="configuracoes"><i class="fas fa-cog icon"></i> Configurações</a></li>
@@ -178,7 +191,7 @@
                 </div>
             </div>
             <br>
-            <div class="card"><h3>Log de Execução</h3><div class="log-output">[2025-10-28 10:15:12] Sistema iniciado. Aguardando comando...</div></div>
+            <div class="card"><h3>Log de Execução</h3><div class="log-output">[2025-10-29 15:00:00] Sistema iniciado. Aguardando comando...</div></div>
         </div>
 
         <div id="adicionar" class="page">
@@ -195,115 +208,72 @@
             </div>
         </div>
 
+        <div id="minhas-taxas" class="page">
+            <div class="page-header"><h1>Gerenciamento das Minhas Taxas</h1></div>
+            <p>Mantenha as taxas dos seus próprios produtos atualizadas para permitir uma comparação precisa nos relatórios.</p>
+            <br>
+            <div class="grid-container">
+                <div class="card"><h3><i class="fas fa-upload" style="margin-right: 10px;"></i>Upload de Planilha</h3><p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Importe suas taxas em massa a partir de um arquivo CSV ou Excel.</p><button class="btn btn-primary">Selecionar Arquivo</button></div>
+                <div class="card"><h3><i class="fas fa-database" style="margin-right: 10px;"></i>Conexão com Base de Dados</h3><p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Sincronize automaticamente com sua base de dados interna.</p><button class="btn btn-primary">Configurar Conexão</button></div>
+                <div class="card" style="grid-column: 1 / -1;"><h3><i class="fas fa-plus" style="margin-right: 10px;"></i>Cadastro Manual</h3><div class="form-group"><label for="my-product-name">Nome do Produto/Serviço</label><input type="text" id="my-product-name" placeholder="Ex: Cartão de Crédito - Parcelado"></div><div class="form-group"><label for="my-product-installments">Parcelas</label><input type="text" id="my-product-installments" placeholder="Ex: 6x"></div><div class="form-group"><label for="my-product-rate">Taxa (%)</label><input type="text" id="my-product-rate" placeholder="Ex: 9.99"></div><button class="btn btn-success">Adicionar Taxa</button></div>
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3>Minhas Taxas Atuais</h3>
+                    <div class="table-container">
+                        <table><thead><tr><th>Produto</th><th>Parcelas</th><th>Taxa</th><th>Ações</th></tr></thead><tbody><tr><td>Cartão de Crédito</td><td>1x</td><td>4.95%</td><td><a href="#">Editar</a> <a href="#" style="color: #e53e3e;">Remover</a></td></tr><tr><td>Cartão de Crédito</td><td>6x</td><td>9.85%</td><td><a href="#">Editar</a> <a href="#" style="color: #e53e3e;">Remover</a></td></tr><tr><td>Cartão de Crédito</td><td>12x</td><td>12.90%</td><td><a href="#">Editar</a> <a href="#" style="color: #e53e3e;">Remover</a></td></tr><tr><td>Pix</td><td>1x</td><td>0.98%</td><td><a href="#">Editar</a> <a href="#" style="color: #e53e3e;">Remover</a></td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="basedados" class="page">
              <div class="page-header"><h1>Acesso à Base de Dados</h1><button class="btn btn-success"><i class="fas fa-file-export"></i> Exportar Base de Dados</button></div>
              <p>Visualização dos dados de taxas de adquirência coletados.</p><br>
              <div class="table-container card">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th><th>Adquirente</th><th>Produto</th><th>Parcelas</th><th>Taxa (Valor)</th><th>Data da Coleta</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>ID</th><th>Adquirente</th><th>Produto</th><th>Parcelas</th><th>Taxa (Valor)</th><th>Data da Coleta</th></tr></thead>
                     <tbody>
-                        <tr><td>1024</td><td>PagBank</td><td>Cartão de crédito</td><td>1x</td><td>4.99%</td><td>2025-10-27 21:15:10</td></tr>
-                        <tr><td>1025</td><td>Mercado Pago</td><td>Cartão de crédito</td><td>1x</td><td>4.98%</td><td>2025-10-27 21:15:12</td></tr>
-                        <tr><td>1026</td><td>Pagar.me</td><td>Cartão de crédito</td><td>12x</td><td>12.99%</td><td>2025-10-27 21:15:14</td></tr>
-                        <tr><td>1027</td><td>PagBank</td><td>Pix</td><td>1x</td><td>0.99%</td><td>2025-10-27 21:15:18</td></tr>
-                        <tr><td>1028</td><td>Mercado Pago</td><td>Cartão de crédito</td><td>6x</td><td>9.90%</td><td>2025-10-27 21:15:21</td></tr>
-                        <tr><td>1029</td><td>Pagar.me</td><td>Pix</td><td>1x</td><td>0.95%</td><td>2025-10-27 21:15:25</td></tr>
+                        <tr><td>1024</td><td>PagBank</td><td>Cartão de crédito</td><td>1x</td><td>4.99%</td><td>2025-10-29 09:15:10</td></tr>
+                        <tr><td>1025</td><td>Mercado Pago</td><td>Cartão de crédito</td><td>1x</td><td>4.98%</td><td>2025-10-29 09:15:12</td></tr>
+                        <tr><td>1026</td><td>Pagar.me</td><td>Cartão de crédito</td><td>12x</td><td>12.99%</td><td>2025-10-29 09:15:14</td></tr>
+                        <tr><td>1027</td><td>PagBank</td><td>Pix</td><td>1x</td><td>0.99%</td><td>2025-10-29 09:15:18</td></tr>
+                        <tr><td>1028</td><td>Mercado Pago</td><td>Cartão de crédito</td><td>6x</td><td>9.90%</td><td>2025-10-29 09:15:21</td></tr>
+                        <tr><td>1029</td><td>Cielo</td><td>Pix</td><td>1x</td><td>0.83%</td><td>2025-10-29 09:15:25</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div id="relatorio" class="page">
-             <div class="page-header"><h1>Relatório de Análise de Taxas</h1><button class="btn btn-primary"><i class="fas fa-plus"></i> Criar Gráfico</button></div>
-             <p>Dashboard interativo para visualizar comparações, filtrar por data, concorrente e produto para obter insights.</p><br>
+            <div class="page-header"><h1>Relatórios e Dashboards</h1><button class="btn btn-primary"><i class="fas fa-plus"></i> Criar Gráfico</button></div>
+            <div class="insights-panel">
+                <h2>Resumo Inteligente da Coleta</h2><p class="last-collection-info">Última coleta realizada hoje, 29/10/2025 às 09:15</p>
+                <div class="insights-grid">
+                    <div class="insight-card"><h4><i class="fas fa-exchange-alt"></i> Principais Movimentações</h4><ul class="movement-list"><li><i class="fas fa-arrow-up text-red"></i> <strong>PagBank:</strong> Aumentou a taxa do parcelado em 12x.</li><li><i class="fas fa-arrow-down text-green"></i> <strong>Cielo:</strong> Reduziu a taxa do PIX.</li></ul></div>
+                    <div class="insight-card promo"><h4><i class="fas fa-bullhorn"></i> Alerta de Promoção</h4><p><strong>Mercado Pago</strong> está com uma campanha de "Taxa Zero" para novos clientes.</p></div>
+                    <div class="insight-card competitive"><h4><i class="fas fa-thumbs-up"></i> Onde Estamos Mais Competitivos</h4><p>Sua taxa para <strong>"Cartão de Crédito - 6x"</strong> está <strong>0.05%</strong> abaixo da média do mercado.</p></div>
+                    <div class="insight-card risk"><h4><i class="fas fa-exclamation-triangle"></i> Pontos de Atenção</h4><p>Sua taxa para <strong>"PIX"</strong> está <strong>0.15%</strong> acima do concorrente mais barato (Cielo).</p></div>
+                </div>
+            </div>
+            <h2 style="margin-top: 40px;">Análise Detalhada</h2>
              <div class="dashboard-grid">
-                <div class="dashboard-card card-full-width">
-                    <a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a>
-                    <h3>Comparativo de Taxas por Parcela</h3>
-                    <p>Análise da estrutura de taxas de cada concorrente para vendas parceladas no cartão de crédito.</p>
-                    <div class="chart-container">
-                        <svg viewBox="0 0 500 250">
-                            <line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line>
-                            <text x="20" y="25" class="chart-label">20%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line>
-                            <text x="20" y="125" class="chart-label">10%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line>
-                            <text x="25" y="225" class="chart-label">0%</text><text x="60" y="235" class="chart-label">1x</text><text x="250" y="235" class="chart-label">6x</text><text x="450" y="235" class="chart-label">12x</text>
-                            <polyline points="65,200 105,180 185,150 265,120 345,90 465,50" fill="none" stroke="#3182ce" stroke-width="2"/>
-                            <polyline points="65,202 105,185 185,160 265,135 345,110 465,75" fill="none" stroke="#38a169" stroke-width="2"/>
-                            <polyline points="65,198 105,175 185,145 265,110 345,80 465,40" fill="none" stroke="#e53e3e" stroke-width="2"/>
-                            <rect x="380" y="25" width="10" height="10" fill="#3182ce"></rect><text x="395" y="34" class="chart-legend">PagBank</text>
-                            <rect x="380" y="45" width="10" height="10" fill="#38a169"></rect><text x="395" y="54" class="chart-legend">Mercado Pago</text>
-                            <rect x="380" y="65" width="10" height="10" fill="#e53e3e"></rect><text x="395" y="74" class="chart-legend">Pagar.me</text>
-                        </svg>
-                    </div>
-                </div>
-                 <div class="dashboard-card">
-                    <a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a>
-                    <h3>Análise Histórica de Taxa - 6x</h3>
-                     <p>Evolução da taxa de adquirência para vendas em 6 parcelas.</p>
-                     <div class="chart-container">
-                        <svg viewBox="0 0 500 250">
-                             <line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line>
-                            <text x="10" y="25" class="chart-label">10.5%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line>
-                            <text x="15" y="125" class="chart-label">10%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line>
-                            <text x="15" y="225" class="chart-label">9.5%</text><text x="60" y="235" class="chart-label">Sem-1</text><text x="250" y="235" class="chart-label">Sem-2</text><text x="440" y="235" class="chart-label">Sem-3</text>
-                             <polyline points="70,120 260,110 450,80" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="70,140 260,135 450,138" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="70,110 260,115 450,100" fill="none" stroke="#e53e3e" stroke-width="2"/>
-                        </svg>
-                     </div>
-                </div>
-                <div class="dashboard-card">
-                    <a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a>
-                    <h3>Análise Histórica de Taxa - 12x</h3>
-                    <p>Evolução da taxa de adquirência para vendas em 12 parcelas.</p>
-                    <div class="chart-container">
-                        <svg viewBox="0 0 500 250">
-                            <line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line>
-                            <text x="15" y="25" class="chart-label">14%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line>
-                            <text x="15" y="125" class="chart-label">13%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line>
-                            <text x="15" y="225" class="chart-label">12%</text><text x="60" y="235" class="chart-label">Sem-1</text><text x="250" y="235" class="chart-label">Sem-2</text><text x="440" y="235" class="chart-label">Sem-3</text>
-                             <polyline points="70,100 260,80 450,50" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="70,120 260,110 450,115" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="70,90 260,95 450,85" fill="none" stroke="#e53e3e" stroke-width="2"/>
-                        </svg>
-                    </div>
-                </div>
+                <div class="dashboard-card card-full-width"><a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a><h3>Comparativo de Taxas por Parcela</h3><div class="chart-container"><svg viewBox="0 0 500 250"><line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line><text x="20" y="25" class="chart-label">20%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line><text x="20" y="125" class="chart-label">10%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line><text x="25" y="225" class="chart-label">0%</text><text x="60" y="235" class="chart-label">1x</text><text x="250" y="235" class="chart-label">6x</text><text x="450" y="235" class="chart-label">12x</text><polyline points="65,200 105,180 185,150 265,120 345,90 465,50" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="65,202 105,185 185,160 265,135 345,110 465,75" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="65,198 105,175 185,145 265,110 345,80 465,40" fill="none" stroke="#e53e3e" stroke-width="2"/><rect x="380" y="25" width="10" height="10" fill="#3182ce"></rect><text x="395" y="34" class="chart-legend">PagBank</text><rect x="380" y="45" width="10" height="10" fill="#38a169"></rect><text x="395" y="54" class="chart-legend">Mercado Pago</text><rect x="380" y="65" width="10" height="10" fill="#e53e3e"></rect><text x="395" y="74" class="chart-legend">Pagar.me</text></svg></div></div>
+                 <div class="dashboard-card"><a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a><h3>Análise Histórica de Taxa - 6x</h3><div class="chart-container"><svg viewBox="0 0 500 250"><line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line><text x="10" y="25" class="chart-label">10.5%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line><text x="15" y="125" class="chart-label">10%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line><text x="15" y="225" class="chart-label">9.5%</text><text x="60" y="235" class="chart-label">Sem-1</text><text x="250" y="235" class="chart-label">Sem-2</text><text x="440" y="235" class="chart-label">Sem-3</text><polyline points="70,120 260,110 450,80" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="70,140 260,135 450,138" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="70,110 260,115 450,100" fill="none" stroke="#e53e3e" stroke-width="2"/></svg></div></div>
+                <div class="dashboard-card"><a href="#" class="edit-chart-btn" title="Editar Gráfico"><i class="fas fa-pencil-alt"></i></a><h3>Análise Histórica de Taxa - 12x</h3><div class="chart-container"><svg viewBox="0 0 500 250"><line x1="40" y1="220" x2="480" y2="220" class="chart-axis-line"></line><line x1="40" y1="20" x2="40" y2="220" class="chart-axis-line"></line><text x="15" y="25" class="chart-label">14%</text><line x1="40" y1="20" x2="480" y2="20" class="chart-grid-line"></line><text x="15" y="125" class="chart-label">13%</text><line x1="40" y1="120" x2="480" y2="120" class="chart-grid-line"></line><text x="15" y="225" class="chart-label">12%</text><text x="60" y="235" class="chart-label">Sem-1</text><text x="250" y="235" class="chart-label">Sem-2</text><text x="440" y="235" class="chart-label">Sem-3</text><polyline points="70,100 260,80 450,50" fill="none" stroke="#3182ce" stroke-width="2"/><polyline points="70,120 260,110 450,115" fill="none" stroke="#38a169" stroke-width="2"/><polyline points="70,90 260,95 450,85" fill="none" stroke="#e53e3e" stroke-width="2"/></svg></div></div>
             </div>
         </div>
 
         <div id="configuracoes" class="page">
             <div class="page-header"><h1>Configurações</h1></div>
             <div class="grid-container">
-                <div class="card">
-                    <h3>Meu Perfil</h3>
-                    <div class="form-group"><label for="profile-name">Nome</label><input type="text" id="profile-name" value="Luiz Henrique Alvarenga"></div>
-                    <div class="form-group"><label for="profile-email">Email</label><input type="email" id="profile-email" value="luiz.alvarenga@email.com" readonly></div>
-                    <div class="notification-toggle">
-                        <div><label>Notificações por Email</label><p class="description">Alerta após a atualização de taxas.</p></div>
-                        <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
-                    </div>
-                    <div style="border-top: 1px solid #4a5568; margin-top: 20px; padding-top: 20px;"><button class="btn btn-primary">Salvar Perfil</button></div>
-                </div>
-                <div class="card">
-                     <h3>Segurança e Acesso</h3>
-                     <div class="form-group"><label>Senha</label><button class="btn btn-secondary">Alterar Senha</button></div>
-                     <div class="form-group" style="margin-top: 30px; border-top: 1px solid #4a5568; padding-top: 20px;">
-                        <label>Sair do Sistema</label><button class="btn btn-danger" onclick="alert('Simulando logout...')"><i class="fas fa-sign-out-alt"></i> Sair (Logout)</button>
-                    </div>
-                </div>
-                <div class="card" style="grid-column: 1 / -1;">
-                    <h3>Integrações do Sistema</h3>
-                    <p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Conecte o PriceWatch a outras plataformas para publicar a base de dados.</p>
-                    <div class="integration-item"><i class="fas fa-file-excel icon" style="color: #38a169;"></i><div class="info"><h4>Google Sheets</h4><p>Sincroniza a base de dados com uma planilha na nuvem.</p></div><span class="status-badge connected">Conectado</span><button class="btn btn-secondary">Gerenciar</button></div>
-                    <div class="integration-item"><i class="fas fa-database icon" style="color: #63b3ed;"></i><div class="info"><h4>Google BigQuery</h4><p>Envia os dados coletados diretamente para o seu data warehouse.</p></div><span class="status-badge connected">Conectado</span><button class="btn btn-secondary">Gerenciar</button></div>
-                </div>
+                <div class="card"><h3>Meu Perfil</h3><div class="form-group"><label for="profile-name">Nome</label><input type="text" id="profile-name" value="Luiz Henrique Alvarenga"></div><div class="form-group"><label for="profile-email">Email</label><input type="email" id="profile-email" value="luiz.alvarenga@email.com" readonly></div><div class="notification-toggle"><div><label>Notificações por Email</label><p class="description">Alerta após a atualização de taxas.</p></div><label class="switch"><input type="checkbox" checked><span class="slider round"></span></label></div><div style="border-top: 1px solid #4a5568; margin-top: 20px; padding-top: 20px;"><button class="btn btn-primary">Salvar Perfil</button></div></div>
+                <div class="card"><h3>Segurança e Acesso</h3><div class="form-group"><label>Senha</label><button class="btn btn-secondary">Alterar Senha</button></div><div class="form-group" style="margin-top: 30px; border-top: 1px solid #4a5568; padding-top: 20px;"><label>Sair do Sistema</label><button class="btn btn-danger" onclick="alert('Simulando logout...')"><i class="fas fa-sign-out-alt"></i> Sair (Logout)</button></div></div>
+                <div class="card" style="grid-column: 1 / -1;"><h3>Integrações do Sistema</h3><p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Conecte o PriceWatch a outras plataformas para publicar a base de dados.</p><div class="integration-item"><i class="fas fa-file-excel icon" style="color: #38a169;"></i><div class="info"><h4>Google Sheets</h4><p>Sincroniza a base de dados com uma planilha na nuvem.</p></div><span class="status-badge connected">Conectado</span><button class="btn btn-secondary">Gerenciar</button></div><div class="integration-item"><i class="fas fa-database icon" style="color: #63b3ed;"></i><div class="info"><h4>Google BigQuery</h4><p>Envia os dados coletados diretamente para o seu data warehouse.</p></div><span class="status-badge connected">Conectado</span><button class="btn btn-secondary">Gerenciar</button></div></div>
                 <div class="card" style="grid-column: 1 / -1;">
                     <h3>Gerenciamento de Usuários</h3>
                     <p style="color:#a0aec0; font-size: 0.9rem; margin-top:-15px; margin-bottom:20px;">Adicione, remova ou edite o acesso dos usuários ao sistema.</p>
                     <div style="margin-bottom: 20px; text-align: right;"><button class="btn btn-success"><i class="fas fa-plus"></i> Adicionar Usuário</button></div>
                     <div class="table-container">
-                        <table>
-                            <thead><tr><th>Nome</th><th>Email</th><th>Perfil de Acesso</th><th>Ações</th></tr></thead>
+                        <table><thead><tr><th>Nome</th><th>Email</th><th>Perfil de Acesso</th><th>Ações</th></tr></thead>
                             <tbody>
                                 <tr><td>Luiz Henrique Alvarenga</td><td>luiz.alvarenga@email.com</td><td><span class="role-badge role-admin">Administrador</span></td><td><a href="#">Editar</a> <a href="#">Remover</a></td></tr>
                                 <tr><td>Vinicius Mistura Bissoli</td><td>vinicius.bissoli@email.com</td><td><span class="role-badge role-analyst">Analista</span></td><td><a href="#">Editar</a> <a href="#">Remover</a></td></tr>
@@ -345,6 +315,5 @@
             }
         });
     </script>
-
 </body>
 </html>
